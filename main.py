@@ -49,10 +49,11 @@ for fn in fns:
     num = 1
     results = []
     for d in data_dics:
+        query = d["request_string"]
         start_time = datetime.now() 
-        prompt = prmt["promt"].format("\n".join(d["request_string"]))
+        prompt = prmt["promt"].format(str(query))
 
-        if num > 5:
+        if num > 50000:
             break
         num += 1 
 
@@ -67,12 +68,13 @@ for fn in fns:
             if len(re.findall(r"\|", l)) == 2:
                 splt_r = l.split("|")
                 results.append({
-                                "createdon": splt_r[0], 
-                                "request_string": splt_r[1],
-                                "tag": splt_r[2]
+                                "init_query": query, 
+                                "rep_query": splt_r[0], 
+                                "sys_num": splt_r[1],
+                                "sys_name": splt_r[2]
                                 })
 
         results_df = pd.DataFrame(results)
         results_df.to_csv(os.path.join("results", fn), sep="\t", index=False)
         end_time = datetime.now() 
-        logger.info(f"Обработано {num} запросов из {len(data_dics)} за {end_time - start_time} секунд")
+        logger.info(f"Файл: {fn} обработано {num} запросов из {len(data_dics)} за {end_time - start_time} секунд")
